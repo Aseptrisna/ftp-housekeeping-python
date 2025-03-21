@@ -1,0 +1,16 @@
+{
+    "apps": [
+      {
+        "name": "daily-ftp-housekeeping-python",
+        "script": "move_daily.py",
+        "interpreter": "python3",
+        "cwd": "./",
+        "watch": false,
+        "env": {
+          "PYTHONUNBUFFERED": "1",
+          "NODE_ENV": "production"
+        }
+      }
+    ]
+  }
+  

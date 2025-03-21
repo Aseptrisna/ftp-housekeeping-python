@@ -149,6 +149,7 @@
 2025-03-21 21:37:26,402 - INFO - File CAM-P071-F1jeTxl0R.jpg berhasil dihapus dari FTP.
 2025-03-21 21:37:26,403 - INFO - [38/6946036] Memproses file: CAM-P074-itKW2OXNR.jpg
 2025-03-21 21:37:26,403 - INFO - Mengunduh file CAM-P074-itKW2OXNR.jpg dari FTP...
+<<<<<<< HEAD
 2025-03-21 21:49:55,133 - INFO - Menghubungkan ke MongoDB...
 2025-03-21 21:49:55,139 - INFO - Berhasil terhubung ke MongoDB.
 2025-03-21 21:49:55,140 - INFO - Berhasil terhubung ke MongoDB.
@@ -11166,3 +11167,6 @@
 2025-03-21 22:05:49,429 - ERROR - Gagal memproses file CAM-P024-u9IdYz58C.jpg: [WinError 10053] An established connection was aborted by the software in your host machine
 2025-03-21 22:05:49,432 - INFO - [3670/6946509] Memproses file: CAM-P029-wOkSuaTgj.jpg
 2025-03-21 22:05:49,432 - INFO - Mengunduh file CAM-P029-wOkSuaTgj.jpg dari FTP...
+=======
+2025-03-21 21:58:26,646 - INFO - Menjalankan scheduler...
+>>>>>>> a8f08bc6bef64402b7bb8f75eb9606917c80c99e
