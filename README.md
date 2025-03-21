@@ -1,4 +1,4 @@
-# FTP Housekeeping with Python
+# FTP Housekeeping with Python 2025
 
 Script Python untuk memindahkan file JPG dari server FTP ke direktori lokal, menghapus file dari FTP setelah dipindahkan, dan menjalankan fungsi berdasarkan waktu tertentu. Dilengkapi dengan logging untuk pelacakan aktivitas.
 
