@@ -1,26 +1,27 @@
 import os
 import ftplib
 import logging
+import schedule
 import time
 from pymongo import MongoClient
-from datetime import datetime
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
 # Muat variabel lingkungan dari file .env
 load_dotenv()
 
 # Konfigurasi FTP dari .env
-FTP_HOST = os.getenv('FTP_HOST')
-FTP_USER = os.getenv('FTP_USER')
-FTP_PASS = os.getenv('FTP_PASS')
-FTP_PORT = int(os.getenv('FTP_PORT'))
-FTP_FOLDER = os.getenv('FTP_FOLDER')
-LOCAL_DIR = os.getenv('LOCAL_DIR')
+FTP_HOST = os.getenv('FTP_HOST_HYLAB')
+FTP_USER = os.getenv('FTP_USER_HYLAB')
+FTP_PASS = os.getenv('FTP_PASS_HYLAB')
+FTP_PORT = int(os.getenv('FTP_PORT_HYLAB', 21))
+FTP_FOLDER = os.getenv('FTP_FOLDER_HYLAB', '/')
+LOCAL_DIR = os.getenv('LOCAL_DIR_HYLAB', '/tmp')
 
 # Konfigurasi MongoDB dari .env
-MONGO_URI = os.getenv('MONGO_URI')
-MONGO_DB_NAME = os.getenv('MONGO_DB', 'default_db')
-MONGO_COLLECTION = os.getenv('MONGO_COLLECTION', 'default_collection')
+MONGO_URI = os.getenv('MONGO_URI_HYLAB')
+MONGO_DB_NAME = os.getenv('MONGO_DB_HYLAB', 'default_db')
+MONGO_COLLECTION = os.getenv('MONGO_COLLECTION_HYLAB', 'default_collection')
 
 # Konfigurasi logging
 logging.basicConfig(
@@ -47,10 +48,9 @@ def connect_mongodb():
 def connect_ftp():
     try:
         ftp = ftplib.FTP()
-        ftp.connect(FTP_HOST, FTP_PORT, timeout=30)  # Timeout 30 detik
+        ftp.connect(FTP_HOST, FTP_PORT)
         ftp.login(FTP_USER, FTP_PASS)
         ftp.cwd(FTP_FOLDER)
-        ftp.set_pasv(True)  # Aktifkan mode pasif
         logging.info("Berhasil terhubung ke FTP.")
         return ftp
     except Exception as e:
@@ -63,18 +63,24 @@ def move_files_from_database():
         # Koneksi ke MongoDB
         logging.info("Menghubungkan ke MongoDB...")
         collection = connect_mongodb()
-        logging.info("Berhasil terhubung ke MongoDB.")
 
         # Koneksi ke FTP
         logging.info("Menghubungkan ke FTP...")
         ftp = connect_ftp()
-        logging.info("Berhasil terhubung ke FTP.")
 
-        # Ambil semua dokumen dengan process = False
-        logging.info("Mengambil dokumen dari MongoDB")
-        files_to_process = list(collection.find())
+        # Mendapatkan tanggal hari ini
+        today = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+        tomorrow = today + timedelta(days=1)
+
+        # Ambil dokumen dengan createdAt di antara hari ini dan besok
+        logging.info(f"Mengambil dokumen dari MongoDB untuk tanggal {today.strftime('%Y-%m-%d')}...")
+        files_to_process = list(
+            collection.find({
+                "createdAt": {"$gte": today, "$lt": tomorrow}
+            })
+        )
         total_files = len(files_to_process)
-        logging.info(f"Menemukan {total_files} file yang belum diproses.")
+        logging.info(f"Menemukan {total_files} file untuk diproses.")
 
         if total_files == 0:
             logging.info("Tidak ada file untuk diproses. Proses selesai.")
@@ -87,13 +93,6 @@ def move_files_from_database():
 
             logging.info(f"[{idx}/{total_files}] Memproses file: {file_name}")
             try:
-                # Cek koneksi FTP, jika terputus, reconnect
-                try:
-                    ftp.voidcmd("NOOP")  # Cek koneksi FTP
-                except:
-                    logging.warning("Koneksi FTP terputus. Mencoba reconnect...")
-                    ftp = connect_ftp()
-
                 # Unduh file dari FTP
                 logging.info(f"Mengunduh file {file_name} dari FTP...")
                 with open(local_path, 'wb') as local_file:
@@ -105,20 +104,20 @@ def move_files_from_database():
                 ftp.delete(file_name)
                 logging.info(f"File {file_name} berhasil dihapus dari FTP.")
 
+                # Perbarui status dokumen di MongoDB
+                logging.info(f"Memperbarui status dokumen di MongoDB untuk file {file_name}...")
+                collection.update_one(
+                    {"_id": document["_id"]},
+                    {"$set": {"process": True, "updatedAt": datetime.utcnow()}}
+                )
+                logging.info(f"Status berhasil diperbarui untuk file: {file_name}")
             except Exception as e:
                 logging.error(f"Gagal memproses file {file_name}: {e}")
-
-            # Delay 1 detik sebelum memproses file berikutnya
-            time.sleep(1)
 
         ftp.quit()
         logging.info("Koneksi ke FTP ditutup. Proses selesai.")
     except Exception as e:
         logging.error(f"Gagal menjalankan move_files_from_database: {e}")
-    finally:
-        # Exit program setelah proses selesai
-        logging.info("Program selesai. Keluar...")
-        sys.exit(0)  # Exit dengan status 0 (berhasil
 
 # Fungsi utama untuk menjalankan skrip
 def main():
@@ -127,5 +126,11 @@ def main():
     except Exception as e:
         logging.error(f"Terjadi kesalahan dalam fungsi main: {e}")
 
+# Menjadwalkan fungsi main untuk berjalan setiap hari pukul 00:00
+schedule.every().day.at("00:00").do(main)
+
 if __name__ == "__main__":
-    main()
+    logging.info("Menjalankan scheduler...")
+    while True:
+        schedule.run_pending()
+        time.sleep(1)  # Tunggu 1 detik untuk menghindari penggunaan CPU yang tinggi
