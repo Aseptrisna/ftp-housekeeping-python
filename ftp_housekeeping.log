@@ -1,0 +1,16 @@
+2025-03-21 21:12:13,320 - INFO - Memindahkan semua file...
+2025-03-21 21:12:13,569 - INFO - Berhasil terhubung ke FTP.
+2025-03-21 21:21:49,814 - INFO - Memindahkan semua file berdasarkan data dari MongoDB...
+2025-03-21 21:21:49,890 - INFO - Berhasil terhubung ke MongoDB.
+2025-03-21 21:28:30,235 - INFO - Berhasil terhubung ke MongoDB.
+2025-03-21 21:28:30,560 - INFO - Berhasil terhubung ke FTP.
+2025-03-21 21:28:30,561 - ERROR - Gagal menjalankan move_files_from_database: 'Cursor' object has no attribute 'count'
+2025-03-21 21:29:31,171 - INFO - Berhasil terhubung ke MongoDB.
+2025-03-21 21:29:34,472 - INFO - Berhasil terhubung ke FTP.
+2025-03-21 21:31:32,859 - INFO - Menghubungkan ke MongoDB...
+2025-03-21 21:31:32,869 - INFO - Berhasil terhubung ke MongoDB.
+2025-03-21 21:31:32,869 - INFO - Berhasil terhubung ke MongoDB.
+2025-03-21 21:31:32,869 - INFO - Menghubungkan ke FTP...
+2025-03-21 21:31:34,077 - INFO - Berhasil terhubung ke FTP.
+2025-03-21 21:31:34,078 - INFO - Berhasil terhubung ke FTP.
+2025-03-21 21:31:34,078 - INFO - Mengambil dokumen dari MongoDB dengan process = False...
