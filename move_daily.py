@@ -20,7 +20,7 @@ LOCAL_DIR = os.getenv('LOCAL_DIR', '/tmp')
 
 # Konfigurasi MongoDB dari .env
 MONGO_URI = os.getenv('MONGO_URI')
-MONGO_DB_NAME = os.getenv('MONGO_DB_NAME', 'default_db')
+MONGO_DB_NAME = os.getenv('MONGO_DB', 'default_db')
 MONGO_COLLECTION = os.getenv('MONGO_COLLECTION', 'default_collection')
 
 # Konfigurasi logging
