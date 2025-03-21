@@ -115,6 +115,10 @@ def move_files_from_database():
         logging.info("Koneksi ke FTP ditutup. Proses selesai.")
     except Exception as e:
         logging.error(f"Gagal menjalankan move_files_from_database: {e}")
+     finally:
+        # Exit program setelah proses selesai
+        logging.info("Program selesai. Keluar...")
+        sys.exit(0)  # Exit dengan status 0 (berhasil
 
 
 # Fungsi utama untuk menjalankan skrip
